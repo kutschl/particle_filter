@@ -2,11 +2,11 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.time import Time
-from rclpy.duration import Duration
-from rclpy.parameter import Parameter
+from rclpy.qos import QoSProfile, QoSDurabilityPolicy
 from rcl_interfaces.msg import ParameterDescriptor
 from rcl_interfaces.msg import IntegerRange, FloatingPointRange
 from tf2_ros import TransformBroadcaster, Buffer, TransformListener
+
 import tf_transformations as tft
 import numpy as np
 import range_libc
@@ -18,7 +18,7 @@ from geometry_msgs.msg import PoseStamped, PoseArray, PointStamped, \
     PoseWithCovarianceStamped, TransformStamped, Quaternion
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry, MapMetaData, OccupancyGrid
-from nav_msgs.srv import GetMap
+from nav_msgs.srv import GetMap # TODO: remove
 
 # Define Datatypes
 from enum import Enum
@@ -31,7 +31,7 @@ from collections import deque
 import cProfile
 import pstats
 
-# TODO: # Dynamic Reconfigure
+# TODO: remove # Dynamic Reconfigure
 # from dynamic_reconfigure.msg import Config
 
 
@@ -58,6 +58,7 @@ class ParticleFilter(Node):
         super().__init__('particle_filter')
         
         self.node_initialized = False
+        self.get_logger().info("Initializing...")
         
         # Parameter 
         self.declare_parameter(
@@ -414,13 +415,13 @@ class ParticleFilter(Node):
             self.alpha_3 = self.get_parameter("alpha_3_tum").get_parameter_value().double_value
             self.alpha_4 = self.get_parameter("alpha_4_tum").get_parameter_value().double_value
             self.lambda_thresh = self.get_parameter("lambda_thresh").get_parameter_value().double_value
-            self.get_logger().info("Using TUM motion model")
+            self.get_logger().info("Used motion model: tum")
         elif self.motion_model_param == 'amcl':
             self.alpha_1 = self.get_parameter("alpha_1_amcl").get_parameter_value().double_value
             self.alpha_2 = self.get_parameter("alpha_2_amcl").get_parameter_value().double_value
             self.alpha_3 = self.get_parameter("alpha_3_amcl").get_parameter_value().double_value
             self.alpha_4 = self.get_parameter("alpha_4_amcl").get_parameter_value().double_value
-            self.get_logger().info("Using AMCL motion model")
+            self.get_logger().info("Used motion model: amcl")
         elif self.motion_model_param == 'arc':
             self.motion_dispersion_arc_x = self.get_parameter("motion_dispersion_arc_x").get_parameter_value().double_value
             self.motion_dispersion_arc_y = self.get_parameter("motion_dispersion_arc_y").get_parameter_value().double_value
@@ -431,13 +432,13 @@ class ParticleFilter(Node):
             self.motion_dispersion_arc_y_max = self.get_parameter("motion_dispersion_arc_y_max").get_parameter_value().double_value
             self.motion_dispersion_arc_theta_min = self.get_parameter("motion_dispersion_arc_theta_min").get_parameter_value().double_value
             self.motion_dispersion_arc_xy_min_x = self.get_parameter("motion_dispersion_arc_xy_min_x").get_parameter_value().double_value
-            self.get_logger().info("Using ARC motion model")
+            self.get_logger().info("Used motion model: arc")
         else:
             # TODO: change params name: ..._mit (we are using as default motion model the MIT motion model)
             self.motion_dispersion_x = self.get_parameter("motion_dispersion_x").get_parameter_value().double_value
             self.motion_dispersion_y = self.get_parameter("motion_dispersion_y").get_parameter_value().double_value
             self.motion_dispersion_theta = self.get_parameter("motion_dispersion_theta").get_parameter_value().double_value
-            self.get_logger().info("Using default MIT motion model")
+            self.get_logger().info("Used motion model: mit (default)")
         
         # Boxed lidar model (using Hokuyo laser scanner) with subscription for scan params
         self.lidar_aspect_ratio = self.get_parameter("lidar_aspect_ratio").get_parameter_value().double_value
@@ -458,7 +459,6 @@ class ParticleFilter(Node):
         self.map_msg: OccupancyGrid = None 
         self.map_params_initialized = False 
         '''Boolean flag set when the map parameters have been updated'''
-        from rclpy.qos import QoSProfile, QoSDurabilityPolicy
         qos_profile = QoSProfile(depth=10)
         qos_profile.durability = QoSDurabilityPolicy.TRANSIENT_LOCAL
         self.map_sub = self.create_subscription(
@@ -538,11 +538,10 @@ class ParticleFilter(Node):
             self.pose_cov_pub = self.create_publisher(PoseWithCovarianceStamped, f'{self.pose_pub_topic}_with_cov', 10)
             '''Publishes inferred pose with Covariance. (default: `/tracked_pose/with_covariance`)'''
         
-        # Subscriptions: placeholders after init_scan_sub is spinned
+        # Subscriptions: placeholders after scan and map params are initialized
         self.odom_sub = None
         self.init_pose_sub = None
         self.clicked_point_sub = None
-        self.map_sub = None
                 
         # Transformations
         self.pub_tf = TransformBroadcaster(self)
@@ -552,7 +551,7 @@ class ParticleFilter(Node):
     def complete_initialization(self):
         """Completes the initialization after the scan parameters are set."""
         
-        self.get_logger().info("Proceeding with the remaining initialization.")
+        self.get_logger().info("Continuing initialization...")
         
         # Initialize Map and Sensor Model
         self.get_boxed_indices()
@@ -600,7 +599,7 @@ class ParticleFilter(Node):
             self.localization_loop
         )
         
-        self.get_logger().info("Initialization was successful.")
+        self.get_logger().info("Finished initialization.")
         self.node_initialized = True
                 
     def scan_cb(self, msg: LaserScan):
@@ -609,7 +608,7 @@ class ParticleFilter(Node):
             self.start_theta = msg.angle_min
             self.end_theta = msg.angle_max
             self.scan_params_initialized = True
-            self.get_logger().info(f"Initialized scan parameters (num_lidar_beams: {self.num_lidar_beams}, start_theta: {self.start_theta}, end_theta: {self.end_theta})")        
+            self.get_logger().info(f"Scan parameter initialized.")        
         elif self.scan_params_initialized and self.map_params_initialized and not self.node_initialized:
             self.complete_initialization()
         elif self.node_initialized:
@@ -621,7 +620,7 @@ class ParticleFilter(Node):
             self.map_msg = msg
             self.map_info = msg.info
             self.map_params_initialized = True
-            self.get_logger().info(f"Initialized map parameters (resolution: {msg.info.resolution}") 
+            self.get_logger().info(f"Map parameter initialized.") 
 
 
     def odom_cb(self, msg: Odometry):
@@ -665,7 +664,7 @@ class ParticleFilter(Node):
         init_var_th = self.init_var_theta
         
         while self.state_lock.locked():
-            self.get_logger().info_once("PF2 Pose Initialization: Waiting for state to become unlocked")
+            self.get_logger().info_once("Local pose initialization: Waiting for state to become unlocked")
             self.get_clock().sleep_for(rclpy.duration.Duration(seconds=0.1))
 
         
@@ -675,7 +674,7 @@ class ParticleFilter(Node):
             posetheta = Utils.quaternion_to_angle(poseo)
 
         self.get_logger().info(
-            f"Setting initial pose at x:{posex:.2f}, y:{posey:.2f}, theta:{np.degrees(posetheta):.2f}deg")
+            f"Local pose initialization at x:{posex:.2f}, y:{posey:.2f}, theta:{np.degrees(posetheta):.2f}deg")
         self.weights = np.ones(self.max_particles) / float(self.max_particles)
         self.particles[:, 0] = posex + \
             np.random.normal(scale=init_var_x, size=self.max_particles)
@@ -693,11 +692,11 @@ class ParticleFilter(Node):
         Future Extension: Informed sampling by spreading over the race line
         '''
         while self.state_lock.locked():
-            self.get_logger().info_once("PF2 Global Initialization: Waiting for state to become unlocked")
+            self.get_logger().info_once("Global pose initialization: Waiting for state to become unlocked")
             self.get_clock().sleep_for(rclpy.duration.Duration(seconds=0.1))
 
         self.state_lock.acquire()
-        self.get_logger().info("Lost Robot Initialization")
+        self.get_logger().info("Global pose initialized.")
 
         # randomize over grid coordinate space
         permissible_x, permissible_y = np.where(self.permissible_region == 1)
@@ -748,7 +747,7 @@ class ParticleFilter(Node):
         elif self.range_method == "glt":
             self.range_method = range_libc.PyGiantLUTCast(
                 oMap, self.max_range_px, self.theta_discretization)
-        self.get_logger().info("Done loading map")
+        self.get_logger().info("Finished: Loading map. ")
 
         # 0: permissible, -1: unmapped, 100: blocked
         array_255 = np.array(self.map_msg.data).reshape((self.map_msg.info.height, self.map_msg.info.width))
@@ -1419,7 +1418,7 @@ class ParticleFilter(Node):
 
             self.odom_initialized = True
         else:
-            self.get_logger().info("PF2...Received first Odometry message")
+            self.get_logger().info("Received first odometry message")
 
         # self.last_stamp = msg.header.stamp
         self.last_stamp = self.get_clock().now()
