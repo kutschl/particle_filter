@@ -1,0 +1,109 @@
+particle_filter:
+  ros__parameters:
+    
+    # ---------------------------------------------------------------------------------------------------
+    # GENERAL 
+    # ---------------------------------------------------------------------------------------------------
+    
+    max_particles: 3000 # Maximum number of particles in the particle filter. Suitable values: <=3000
+    max_viz_particles: 50 # Number of particles to visualize if visualization is enabled.
+    use_viz: false # Enable or disable visualization.
+    
+    publish_tf: true # Enable publishing of TF transforms from base_link to map
+    publish_covariance: false  # Publish pose with covariance
+
+    pose_pub_topic: "/pf/pose" 
+    odom_topic: "/odom" 
+    scan_topic: "/scan" 
+    map_topic: "/map"
+
+    # Number of discrete angular values for the lookup table (LUT).
+    # This parameter affects the resolution of angular discretization.
+    theta_discretization: 150
+
+    # Initial pose
+    use_initial_pose: true # true: initial pose used; false: global localization is used (no initial pose).
+    initial_pose_x: 0.0
+    initial_pose_y: 0.0
+    initial_pose_theta: 0.0
+    initial_var_x: 0.5
+    initial_var_y: 0.5
+    initial_var_theta: 0.4
+
+    # Transformation translation from base_link to laser frame.
+    tf_base_link_to_laser_x: 0.27
+    tf_base_link_to_laser_y: 0.00
+    tf_base_link_to_laser_z: 0.11
+    
+    # ---------------------------------------------------------------------------------------------------
+    # SENSOR MODEL 
+    # ---------------------------------------------------------------------------------------------------
+
+    squash_factor: 2.2 # Probability adjustment factor for the sensor model.
+    max_range: 20.0 # Probability adjustment factor for the sensor model.
+    
+    # Method for range calculation (e.g., 'glt', 'rmgpu', 'pcddt').
+    range_method: "glt" 
+
+    # RangeLib variant to use for range calculations. Allowed values:
+    # 0: VAR_NO_EVAL_SENSOR_MODEL - No sensor model evaluation
+    # 1: VAR_CALC_RANGE_MANY_EVAL_SENSOR - Calculate range with multiple evaluations
+    # 2: VAR_REPEAT_ANGLES_EVAL_SENSOR - Repeat angles with sensor model evaluation
+    # 3: VAR_REPEAT_ANGLES_EVAL_SENSOR_ONE_SHOT - One-shot evaluation with repeated angles
+    # 4: VAR_RADIAL_CDDT_OPTIMIZATIONS - Radial optimizations for CDDT
+    # Try variants: (rmgpu,2), (pcddt,3),(glt,3)
+    rangelib_variant: 3
+
+    # Probabilities for the different laser hit modalities. Should sum to 1
+    z_hit: 0.85 # Probability of hitting the intended target.
+    z_short: 0.01 # Probability of an unexpected short reading.
+    z_max: 0.025 # Probability of an out-of-range reading beyond max_range.
+    z_rand: 0.025 # Probability of a random reading anywhere in the valid range.
+
+    sigma_hit: 0.4 # Standard deviation of the hit probability distribution.
+    lambda_short: 0.1 # Parameter for the short reading exponential distribution.
+
+    # Aspect ratio of the LiDAR sensor field.
+    lidar_aspect_ratio: 3.0
+
+    # Desired number of LiDAR beams. Should be an odd number.
+    des_lidar_beams: 21
+
+    # ---------------------------------------------------------------------------------------------------
+    # MOTION MODEL 
+    # ---------------------------------------------------------------------------------------------------
+
+    # Choose between: 'tum', 'amcl', 'arc'.
+    motion_model: "tum"
+
+    # TUM motion model
+    alpha_1_tum: 0.5
+    alpha_2_tum: 0.015
+    alpha_3_tum: 1.0
+    alpha_4_tum: 0.1
+    lambda_thresh: 0.1
+
+    # AMCL motion model
+    alpha_1_amcl: 0.5
+    alpha_2_amcl: 0.5
+    alpha_3_amcl: 1.0
+    alpha_4_amcl: 0.1
+
+    # ARC motion model
+    motion_dispersion_arc_x: 0.05 # Motion dispersion in x direction for ARC model.
+    motion_dispersion_arc_y: 0.025 # Motion dispersion in y direction for ARC model.
+    motion_dispersion_arc_theta: 0.25 # Motion dispersion in theta direction for ARC model.
+    motion_dispersion_arc_xy: 0.0 # Motion dispersion between x and y for ARC model.
+    motion_dispersion_arc_x_min: 0.01 # Minimum dispersion in x direction for ARC model.
+    motion_dispersion_arc_y_min: 0.01 # Minimum dispersion in y direction for ARC model.
+    motion_dispersion_arc_y_max: 0.01 # Maximum dispersion in y direction for ARC model.
+    motion_dispersion_arc_theta_min: 0.01 # Minimum dispersion in theta direction for ARC model.
+    motion_dispersion_arc_xy_min_x: 0.01 # Minimum dispersion between x and y for ARC model.
+
+    # MIT motion model (default)
+    motion_dispersion_x: 0.05 # Motion dispersion in the x direction for default MIT model.
+    motion_dispersion_y: 0.025 # Motion dispersion in the y direction for default MIT model.
+    motion_dispersion_theta: 0.25  # Motion dispersion in the theta (orientation) direction for default MIT model.
+
+    
+
