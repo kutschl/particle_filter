@@ -415,13 +415,13 @@ class ParticleFilter(Node):
             self.alpha_3 = self.get_parameter("alpha_3_tum").get_parameter_value().double_value
             self.alpha_4 = self.get_parameter("alpha_4_tum").get_parameter_value().double_value
             self.lambda_thresh = self.get_parameter("lambda_thresh").get_parameter_value().double_value
-            self.get_logger().info("Used motion model: tum")
+            self.get_logger().info("Motion model: tum")
         elif self.motion_model_param == 'amcl':
             self.alpha_1 = self.get_parameter("alpha_1_amcl").get_parameter_value().double_value
             self.alpha_2 = self.get_parameter("alpha_2_amcl").get_parameter_value().double_value
             self.alpha_3 = self.get_parameter("alpha_3_amcl").get_parameter_value().double_value
             self.alpha_4 = self.get_parameter("alpha_4_amcl").get_parameter_value().double_value
-            self.get_logger().info("Used motion model: amcl")
+            self.get_logger().info("Motion model: amcl")
         elif self.motion_model_param == 'arc':
             self.motion_dispersion_arc_x = self.get_parameter("motion_dispersion_arc_x").get_parameter_value().double_value
             self.motion_dispersion_arc_y = self.get_parameter("motion_dispersion_arc_y").get_parameter_value().double_value
@@ -432,13 +432,13 @@ class ParticleFilter(Node):
             self.motion_dispersion_arc_y_max = self.get_parameter("motion_dispersion_arc_y_max").get_parameter_value().double_value
             self.motion_dispersion_arc_theta_min = self.get_parameter("motion_dispersion_arc_theta_min").get_parameter_value().double_value
             self.motion_dispersion_arc_xy_min_x = self.get_parameter("motion_dispersion_arc_xy_min_x").get_parameter_value().double_value
-            self.get_logger().info("Used motion model: arc")
+            self.get_logger().info("Motion model: arc")
         else:
             # TODO: change params name: ..._mit (we are using as default motion model the MIT motion model)
             self.motion_dispersion_x = self.get_parameter("motion_dispersion_x").get_parameter_value().double_value
             self.motion_dispersion_y = self.get_parameter("motion_dispersion_y").get_parameter_value().double_value
             self.motion_dispersion_theta = self.get_parameter("motion_dispersion_theta").get_parameter_value().double_value
-            self.get_logger().info("Used motion model: mit (default)")
+            self.get_logger().info("Motion model: mit (default)")
         
         # Boxed lidar model (using Hokuyo laser scanner) with subscription for scan params
         self.lidar_aspect_ratio = self.get_parameter("lidar_aspect_ratio").get_parameter_value().double_value
