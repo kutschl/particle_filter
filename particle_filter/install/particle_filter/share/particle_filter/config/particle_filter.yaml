@@ -1,0 +1,43 @@
+particle_filter:
+  ros__parameters:
+    update_rate: 50
+
+    odom_topic: /odom
+    scan_topic: /scan
+    base_frame: base_link
+    pose_topic: /pose
+    publish_tf: true
+
+    num_particles: 1000
+
+    lidar_range_min: 0.0 
+    lidar_range_max: 20.0 
+
+    # Initial pose
+    use_initial_pose: true 
+    initial_pose:
+      position:
+        x: 0.0
+        y: 0.0
+      orientation:
+        a: 0.0
+      covariance:
+        xx: 0.5
+        yy: 0.5
+        aa: 0.1
+
+    # Lidar downsampling
+    downsampling_method: 'BOX'
+    boxed: 
+      box_aspect_ratio: 3.5
+      num_beams: 50
+    uniform:
+      num_beams: 60
+
+    # Raycasting
+    raycasting_method: 'GLT'
+    theta_discretization: 112
+
+    # Motion model 
+    motion_model: 'TUM'
+    

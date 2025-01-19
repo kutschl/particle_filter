@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: particle_filter
+Version: 0.0.1
+Summary: LAMARRacing particle filter
+Maintainer: lukas
+Maintainer-email: lukas.kutsch@gmail.com
+License: MIT license
+Requires-Dist: setuptools

@@ -1,0 +1,53 @@
+particle_filter:
+  ros__parameters:
+    
+    update_rate: 50
+
+    odom_topic: /odom
+    steering_angle_topic: /steering_angle
+    scan_topic: /scan
+    pose_topic: /pose
+    base_frame: base_link
+    publish_tf: true
+
+    num_particles: 1000
+    lidar_range_min: 0.0 
+    lidar_range_max: 20.0 
+
+    # Raycasting
+    raycasting_method: 'GLT'
+    theta_discretization: 112
+
+    # beam based sensor model
+    rangelib_variant: 3
+    z_hit: 0.85
+    z_short: 0.10
+    z_max: 0.025
+    z_rand: 0.025
+    sigma_hit: 0.1
+    lambda_short: 0.25
+
+    # inital pose
+    use_initial_pose: true 
+    initial_pose_x: 0.0
+    initial_pose_y: 0.0
+    initial_pose_a: 0.0
+    initial_cov_xx: 0.5
+    initial_cov_yy: 0.5
+    initial_cov_aa: 0.1
+    
+    # Lidar downsampling
+    downsampling_method: 'BOX'
+    box: 
+      box_aspect_ratio: 3.5
+      num_beams: 50
+    uni:
+      num_beams: 60
+
+
+
+    # Motion model 
+    motion_model: 'TUM'
+    
+
+    

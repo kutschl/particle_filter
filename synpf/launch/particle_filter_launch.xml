@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="particle_filter" exec="particle_filter" name="particle_filter" output="screen">
+        <param from="$(find-pkg-share particle_filter)/config/particle_filter.yaml"/>
+    </node>
+</launch>
+
+
+
+        

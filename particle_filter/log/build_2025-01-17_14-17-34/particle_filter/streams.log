@@ -1,0 +1,28 @@
+[0.562s] Invoking command in '/home/lukas/Desktop/larace/pf/particle_filter': PYTHONPATH=/home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lukas/Desktop/larace/pf/particle_filter/install/particle_filter/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/particle_filter build --build-base /home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/build install --record /home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/install.log --single-version-externally-managed install_data
+[0.725s] running egg_info
+[0.799s] writing build/particle_filter/particle_filter.egg-info/PKG-INFO
+[0.799s] writing dependency_links to build/particle_filter/particle_filter.egg-info/dependency_links.txt
+[0.799s] writing entry points to build/particle_filter/particle_filter.egg-info/entry_points.txt
+[0.799s] writing requirements to build/particle_filter/particle_filter.egg-info/requires.txt
+[0.799s] writing top-level names to build/particle_filter/particle_filter.egg-info/top_level.txt
+[0.824s] reading manifest file 'build/particle_filter/particle_filter.egg-info/SOURCES.txt'
+[0.824s] writing manifest file 'build/particle_filter/particle_filter.egg-info/SOURCES.txt'
+[0.824s] running build
+[0.825s] running build_py
+[0.825s] copying particle_filter/downsampling/__init__.py -> /home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/build/lib/particle_filter/downsampling
+[0.825s] copying particle_filter/downsampling/downsampling_interface.py -> /home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/build/lib/particle_filter/downsampling
+[0.825s] copying particle_filter/downsampling/box_downsampling.py -> /home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/build/lib/particle_filter/downsampling
+[0.825s] copying particle_filter/downsampling/uniform_downsampling.py -> /home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/build/lib/particle_filter/downsampling
+[0.825s] running install
+[0.829s] running install_lib
+[0.840s] running install_data
+[0.840s] copying resource/particle_filter -> /home/lukas/Desktop/larace/pf/particle_filter/install/particle_filter/share/ament_index/resource_index/packages
+[0.841s] copying package.xml -> /home/lukas/Desktop/larace/pf/particle_filter/install/particle_filter/share/particle_filter
+[0.841s] copying launch/localization_launch.xml -> /home/lukas/Desktop/larace/pf/particle_filter/install/particle_filter/share/particle_filter/launch
+[0.841s] running install_egg_info
+[0.852s] removing '/home/lukas/Desktop/larace/pf/particle_filter/install/particle_filter/lib/python3.10/site-packages/particle_filter-0.0.1-py3.10.egg-info' (and everything under it)
+[0.852s] Copying build/particle_filter/particle_filter.egg-info to /home/lukas/Desktop/larace/pf/particle_filter/install/particle_filter/lib/python3.10/site-packages/particle_filter-0.0.1-py3.10.egg-info
+[0.853s] running install_scripts
+[0.880s] Installing particle_filter script to /home/lukas/Desktop/larace/pf/particle_filter/install/particle_filter/lib/particle_filter
+[0.881s] writing list of installed files to '/home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/install.log'
+[0.900s] Invoked command in '/home/lukas/Desktop/larace/pf/particle_filter' returned '0': PYTHONPATH=/home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lukas/Desktop/larace/pf/particle_filter/install/particle_filter/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/particle_filter build --build-base /home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/build install --record /home/lukas/Desktop/larace/pf/particle_filter/build/particle_filter/install.log --single-version-externally-managed install_data
