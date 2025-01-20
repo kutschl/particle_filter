@@ -8,6 +8,8 @@ build/particle_filter/particle_filter.egg-info/entry_points.txt
 build/particle_filter/particle_filter.egg-info/requires.txt
 build/particle_filter/particle_filter.egg-info/top_level.txt
 build/particle_filter/particle_filter.egg-info/zip-safe
+config/map.png
+config/map.yaml
 config/particle_filter.yaml
 launch/localization_launch.xml
 particle_filter/__init__.py

@@ -1,0 +1,11 @@
+free_thresh: 0.25
+image: map.png
+mode: trinary
+negate: 0
+occupied_thresh: 0.65
+origin:
+- -9.95
+- -2.91
+- 0
+planner_image: THORSTEN5_planner.png
+resolution: 0.02

@@ -1,6 +1,19 @@
 <?xml version="1.0"?>
 <launch>
+    <!-- particle filter node-->
     <node pkg="particle_filter" name="particle_filter" exec="particle_filter" output="screen">
         <param from="$(find-pkg-share particle_filter)/config/particle_filter.yaml"/>
     </node>
+
+    <!-- nav2 lifecycle manager -->
+    <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_localization" output="screen">
+        <param name="autostart" value="True"/>
+        <param name="node_names" value="['map_server']"/>
+    </node>  
+
+    <!-- map server to publish the map-->
+    <node pkg="nav2_map_server" exec="map_server" output="screen">
+        <param name="yaml_filename" value="$(find-pkg-share particle_filter)/config/map.yaml"/>
+    </node>
+    
 </launch>

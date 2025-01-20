@@ -1,0 +1,34 @@
+[0.516s] Invoking command in '/home/lukas/particle_filter/particle_filter': PYTHONPATH=/home/lukas/particle_filter/particle_filter/build/particle_filter/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lukas/particle_filter/particle_filter/install/particle_filter/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/particle_filter build --build-base /home/lukas/particle_filter/particle_filter/build/particle_filter/build install --record /home/lukas/particle_filter/particle_filter/build/particle_filter/install.log --single-version-externally-managed install_data
+[0.671s] running egg_info
+[0.739s] writing build/particle_filter/particle_filter.egg-info/PKG-INFO
+[0.739s] writing dependency_links to build/particle_filter/particle_filter.egg-info/dependency_links.txt
+[0.740s] writing entry points to build/particle_filter/particle_filter.egg-info/entry_points.txt
+[0.740s] writing requirements to build/particle_filter/particle_filter.egg-info/requires.txt
+[0.740s] writing top-level names to build/particle_filter/particle_filter.egg-info/top_level.txt
+[0.761s] reading manifest file 'build/particle_filter/particle_filter.egg-info/SOURCES.txt'
+[0.762s] writing manifest file 'build/particle_filter/particle_filter.egg-info/SOURCES.txt'
+[0.762s] running build
+[0.762s] running build_py
+[0.762s] copying particle_filter/__init__.py -> /home/lukas/particle_filter/particle_filter/build/particle_filter/build/lib/particle_filter
+[0.762s] copying particle_filter/particle_filter_node.py -> /home/lukas/particle_filter/particle_filter/build/particle_filter/build/lib/particle_filter
+[0.762s] copying particle_filter/lidar_downsampling/__init__.py -> /home/lukas/particle_filter/particle_filter/build/particle_filter/build/lib/particle_filter/lidar_downsampling
+[0.762s] copying particle_filter/lidar_downsampling/downsampling_interface.py -> /home/lukas/particle_filter/particle_filter/build/particle_filter/build/lib/particle_filter/lidar_downsampling
+[0.763s] copying particle_filter/lidar_downsampling/box_downsampling.py -> /home/lukas/particle_filter/particle_filter/build/particle_filter/build/lib/particle_filter/lidar_downsampling
+[0.763s] copying particle_filter/lidar_downsampling/uniform_downsampling.py -> /home/lukas/particle_filter/particle_filter/build/particle_filter/build/lib/particle_filter/lidar_downsampling
+[0.763s] copying particle_filter/motion_models/__init__.py -> /home/lukas/particle_filter/particle_filter/build/particle_filter/build/lib/particle_filter/motion_models
+[0.763s] running install
+[0.767s] running install_lib
+[0.778s] running install_data
+[0.778s] copying resource/particle_filter -> /home/lukas/particle_filter/particle_filter/install/particle_filter/share/ament_index/resource_index/packages
+[0.778s] copying package.xml -> /home/lukas/particle_filter/particle_filter/install/particle_filter/share/particle_filter
+[0.778s] copying launch/localization_launch.xml -> /home/lukas/particle_filter/particle_filter/install/particle_filter/share/particle_filter/launch
+[0.778s] copying config/map.yaml -> /home/lukas/particle_filter/particle_filter/install/particle_filter/share/particle_filter/config
+[0.778s] copying config/particle_filter.yaml -> /home/lukas/particle_filter/particle_filter/install/particle_filter/share/particle_filter/config
+[0.779s] copying config/map.png -> /home/lukas/particle_filter/particle_filter/install/particle_filter/share/particle_filter/config
+[0.779s] running install_egg_info
+[0.787s] removing '/home/lukas/particle_filter/particle_filter/install/particle_filter/lib/python3.10/site-packages/particle_filter-0.0.1-py3.10.egg-info' (and everything under it)
+[0.788s] Copying build/particle_filter/particle_filter.egg-info to /home/lukas/particle_filter/particle_filter/install/particle_filter/lib/python3.10/site-packages/particle_filter-0.0.1-py3.10.egg-info
+[0.788s] running install_scripts
+[0.809s] Installing particle_filter script to /home/lukas/particle_filter/particle_filter/install/particle_filter/lib/particle_filter
+[0.810s] writing list of installed files to '/home/lukas/particle_filter/particle_filter/build/particle_filter/install.log'
+[0.829s] Invoked command in '/home/lukas/particle_filter/particle_filter' returned '0': PYTHONPATH=/home/lukas/particle_filter/particle_filter/build/particle_filter/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lukas/particle_filter/particle_filter/install/particle_filter/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/particle_filter build --build-base /home/lukas/particle_filter/particle_filter/build/particle_filter/build install --record /home/lukas/particle_filter/particle_filter/build/particle_filter/install.log --single-version-externally-managed install_data

@@ -9,6 +9,7 @@ particle_filter:
     pose_topic: /pose
     base_frame: base_link
     publish_tf: true
+    publish_particles: true
 
     num_particles: 1000
     lidar_range_min: 0.0 
@@ -18,8 +19,16 @@ particle_filter:
     raycasting_method: 'GLT'
     theta_discretization: 112
 
-    # beam based sensor model
+    # RangeLib variant to use for range calculations. Allowed values:
+    # 0: VAR_NO_EVAL_SENSOR_MODEL - No sensor model evaluation
+    # 1: VAR_CALC_RANGE_MANY_EVAL_SENSOR - Calculate range with multiple evaluations
+    # 2: VAR_REPEAT_ANGLES_EVAL_SENSOR - Repeat angles with sensor model evaluation
+    # 3: VAR_REPEAT_ANGLES_EVAL_SENSOR_ONE_SHOT - One-shot evaluation with repeated angles
+    # 4: VAR_RADIAL_CDDT_OPTIMIZATIONS - Radial optimizations for CDDT
+    # Try variants: (rmgpu,2), (pcddt,3),(glt,3)
     rangelib_variant: 3
+    
+    # beam based sensor model
     z_hit: 0.85
     z_short: 0.10
     z_max: 0.025
