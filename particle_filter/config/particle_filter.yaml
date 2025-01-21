@@ -28,7 +28,7 @@ particle_filter:
     # Try variants: (rmgpu,2), (pcddt,3),(glt,3)
     rangelib_variant: 3
     
-    # beam based sensor model
+    # Sensor model
     z_hit: 0.85
     z_short: 0.10
     z_max: 0.025
@@ -36,7 +36,7 @@ particle_filter:
     sigma_hit: 0.1
     lambda_short: 0.25
 
-    # inital pose
+    # Initial pose
     use_initial_pose: true 
     initial_pose_x: 0.0
     initial_pose_y: 0.0
@@ -50,13 +50,29 @@ particle_filter:
     box: 
       box_aspect_ratio: 3.5
       num_beams: 50
-    uni:
+    uniform:
       num_beams: 60
 
-
-
-    # Motion model 
-    motion_model: 'TUM'
+    # Motion model
+    motion_model: 'BYC'
+    bycycle:
+      alpha_1: 0.5
+      alpha_2: 0.015
+      alpha_3: 1.0
+      alpha_4: 0.1
+      lf: 0.30 # distance [m] from front axis to center of mass
+      lr: 0.00 # distance [m] from rear axis to center of mass
+    tum:
+      alpha_1: 0.5
+      alpha_2: 0.015
+      alpha_3: 1.0
+      alpha_4: 0.1
+      lambda_theshold: 0.1
+    amcl: 
+      alpha_1: 0.05
+      alpha_2: 0.05
+      alpha_3: 0.15
+      alpha_4: 0.05
     
 
     

@@ -1,6 +1,7 @@
 import numpy as np 
 import range_libc
 from rclpy.node import Node
+from rclpy.time import Time
 from rclpy.duration import Duration
 import rclpy 
 from tf_transformations import euler_from_quaternion
@@ -112,6 +113,17 @@ class ParticleFilter(Node):
         
         self.motion_model = self.get_parameter('motion_model').get_parameter_value().string_value
         '''Motion model'''
+        self.odom_pose: np.ndarray = None
+        '''NDarray with odometry pose (x,y,theta,time)'''
+        self.odom_last_pose: np.ndarray = None
+        '''NDarray with last used odometry pose (x,y,theta,time) for the motion update'''
+        self.steering_angle: float = None 
+        '''NDarray with steering angle'''
+        self.odom_vx: np.ndarray = None 
+        '''TODO: NDarray (vx, time)'''
+        self.odom_last_vx: np.ndarray = None
+        '''TODO: NDarray (vx, time)'''
+        
         
         self.lidar_initialized: bool = False 
         '''Boolean flag set when laser range measurement arrived'''
@@ -124,8 +136,6 @@ class ParticleFilter(Node):
         self.pf_initialized: bool = False
         '''TODO'''
         
-        self.models_initialized = False
-        self.sensors_initialized = False
 
         self.map_info: MapMetaData = None
         '''Map meta info'''
@@ -347,8 +357,6 @@ class ParticleFilter(Node):
         self.sensor_model_lut = z_hit*P_hit + z_short*P_short + z_max*P_max + z_rand*P_rand
         if self.rangelib_variant > 0:
             self.raycasting_method.set_sensor_model(self.sensor_model_lut)      
-        
-        del P_hit, P_max, P_rand, P_short
         self.sensor_model_initialized = True  
         self.get_logger().info('Sensor model precomputed!')
         
@@ -362,7 +370,6 @@ class ParticleFilter(Node):
         particles[:,1] = init_pose_y + np.random.normal(scale=self.init_var_y, size=self.num_particles)    
         particles[:,2] = init_pose_theta + np.random.normal(scale=self.init_var_theta, size=self.num_particles)       
         self.particles = particles.copy()
-        del particles
         self.get_logger().info(f'Initial particle set computed around ({init_pose_x, init_pose_y, init_pose_theta}).')
         
         
@@ -371,7 +378,7 @@ class ParticleFilter(Node):
         # Extract the pose 
         x = msg.pose.pose.position.x
         y = msg.pose.pose.position.y 
-        _,_,theta = euler_from_quaternion([msg.pose.pose.orientation.w, msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z])
+        _,_,theta = euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
         self.get_logger().info(f'Initial pose update: ({x,y,theta})')
         
         # Set initial pose
@@ -395,7 +402,7 @@ class ParticleFilter(Node):
         
         # Transform particle set from map to world coordinates 
         scale = self.map_info.resolution
-        angle = euler_from_quaternion([self.map_info.origin.orientation.w, self.map_info.origin.orientation.x, self.map_info.origin.orientation.y, self.map_info.origin.orientation.z])
+        angle = euler_from_quaternion([self.map_info.origin.orientation.x, self.map_info.origin.orientation.y, self.map_info.origin.orientation.z, self.map_info.origin.orientation.w])
         c,s = np.cos(angle), np.sin(angle)
         particles_buffer = np.copy(particles)
         # Rotation 
@@ -409,16 +416,20 @@ class ParticleFilter(Node):
         
         # Save initial particle set
         self.particles = particles.copy()
-        del particles
         self.get_logger().info(f'Initial particle set computed based on global localization!')
     
     
     def odom_cb(self, msg: Odometry):
         if self.pf_initialized:
+            # Set odom pose
             x = msg.pose.pose.position.x
             y = msg.pose.pose.position.y
-            _,_,a = euler_from_quaternion([msg.pose.pose.orientation.w, msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z])
-            self.odom_pose = np.array([x,y,a])
+            _,_,theta = euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
+            time = Time.from_msg(msg.header.stamp).nanoseconds
+            self.odom_pose = np.array([x,y,theta,time])
+            # Set odom velocity
+            vx = msg.twist.twist.linear.x
+            self.odom_vx = np.array([vx, time])
         
         # Initialize odometry 
         if not self.odom_initialized:
@@ -427,7 +438,7 @@ class ParticleFilter(Node):
             
     def steering_angle_cb(self, msg: Float64):
         if self.pf_initialized:
-            pass 
+            self.steering_angle = msg.data 
     
     
     def precompute_lidar_downsampling(self):
@@ -465,6 +476,18 @@ class ParticleFilter(Node):
             
 
     def loop(self):
+        self.get_logger().info('loop')
+        
+        if isinstance(self.odom_last_pose, np.ndarray):
+            self.get_logger().info(f'dt: {(self.odom_pose[3]-self.odom_last_pose[3])/10**9}')
+        
+        self.odom_vx = self.odom_vx.copy()
+        self.odom_last_pose = self.odom_pose.copy()
+        # 
+        # self.odom_last_pose = self.odom_pose.copy()
+        
+            
+        
         pass
         
 

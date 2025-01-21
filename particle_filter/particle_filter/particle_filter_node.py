@@ -1,6 +1,7 @@
 import numpy as np 
 import range_libc
 from rclpy.node import Node
+from rclpy.time import Time
 from rclpy.duration import Duration
 import rclpy 
 from tf_transformations import euler_from_quaternion
@@ -112,6 +113,47 @@ class ParticleFilter(Node):
         
         self.motion_model = self.get_parameter('motion_model').get_parameter_value().string_value
         '''Motion model'''
+        self.mm_bycycle_alpha1 = self.get_parameter('bycycle.alpha_1').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_bycycle_alpha2 = self.get_parameter('bycycle.alpha_2').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_bycycle_alpha3 = self.get_parameter('bycycle.alpha_3').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_bycycle_alpha4 = self.get_parameter('bycycle.alpha_4').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_bycycle_lf = self.get_parameter('bycycle.lf').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_bycycle_lr = self.get_parameter('bycycle.lr').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_tum_alpha_1 = self.get_parameter('tum.alpha_1').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_tum_alpha_2 = self.get_parameter('tum.alpha_2').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_tum_alpha_3 = self.get_parameter('tum.alpha_3').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_tum_alpha_4 = self.get_parameter('tum.alpha_4').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_tum_lambda_threshold = self.get_parameter('tum.lambda_threshold').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_amcl_alpha1 = self.get_parameter('amcl.alpha_1').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_amcl_alpha2 = self.get_parameter('amcl.alpha_2').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_amcl_alpha3 = self.get_parameter('amcl.alpha_3').get_parameter_value().double_value
+        '''TODO'''
+        self.mm_amcl_alpha4 = self.get_parameter('amcl.alpha_4').get_parameter_value().double_value
+        '''TODO'''
+        self.odom_pose: np.ndarray = None
+        '''NDarray with odometry pose (x,y,theta,time)'''
+        self.odom_last_pose: np.ndarray = None
+        '''NDarray with last used odometry pose (x,y,theta,time) for the motion update'''
+        self.odom_vx: np.ndarray = None 
+        '''TODO: NDarray (vx, time)'''
+        self.odom_last_vx: np.ndarray = None
+        '''TODO: NDarray (vx, time)'''
+        self.steering_angle: float = None 
+        '''NDarray with steering angle'''
+
         
         self.lidar_initialized: bool = False 
         '''Boolean flag set when laser range measurement arrived'''
@@ -124,8 +166,6 @@ class ParticleFilter(Node):
         self.pf_initialized: bool = False
         '''TODO'''
         
-        self.models_initialized = False
-        self.sensors_initialized = False
 
         self.map_info: MapMetaData = None
         '''Map meta info'''
@@ -368,7 +408,7 @@ class ParticleFilter(Node):
         # Extract the pose 
         x = msg.pose.pose.position.x
         y = msg.pose.pose.position.y 
-        _,_,theta = euler_from_quaternion([msg.pose.pose.orientation.w, msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z])
+        _,_,theta = euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
         self.get_logger().info(f'Initial pose update: ({x,y,theta})')
         
         # Set initial pose
@@ -392,7 +432,7 @@ class ParticleFilter(Node):
         
         # Transform particle set from map to world coordinates 
         scale = self.map_info.resolution
-        angle = euler_from_quaternion([self.map_info.origin.orientation.w, self.map_info.origin.orientation.x, self.map_info.origin.orientation.y, self.map_info.origin.orientation.z])
+        angle = euler_from_quaternion([self.map_info.origin.orientation.x, self.map_info.origin.orientation.y, self.map_info.origin.orientation.z, self.map_info.origin.orientation.w])
         c,s = np.cos(angle), np.sin(angle)
         particles_buffer = np.copy(particles)
         # Rotation 
@@ -411,10 +451,15 @@ class ParticleFilter(Node):
     
     def odom_cb(self, msg: Odometry):
         if self.pf_initialized:
+            # Set odom pose
             x = msg.pose.pose.position.x
             y = msg.pose.pose.position.y
-            _,_,a = euler_from_quaternion([msg.pose.pose.orientation.w, msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z])
-            self.odom_pose = np.array([x,y,a])
+            _,_,theta = euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
+            time = Time.from_msg(msg.header.stamp).nanoseconds
+            self.odom_pose = np.array([x,y,theta,time])
+            # Set odom velocity
+            vx = msg.twist.twist.linear.x
+            self.odom_vx = np.array([vx, time])
         
         # Initialize odometry 
         if not self.odom_initialized:
@@ -423,7 +468,7 @@ class ParticleFilter(Node):
             
     def steering_angle_cb(self, msg: Float64):
         if self.pf_initialized:
-            pass 
+            self.steering_angle = msg.data 
     
     
     def precompute_lidar_downsampling(self):
@@ -461,6 +506,18 @@ class ParticleFilter(Node):
             
 
     def loop(self):
+        self.get_logger().info('loop')
+        
+        if isinstance(self.odom_last_pose, np.ndarray):
+            self.get_logger().info(f'dt: {(self.odom_pose[3]-self.odom_last_pose[3])/10**9}')
+        
+        self.odom_vx = self.odom_vx.copy()
+        self.odom_last_pose = self.odom_pose.copy()
+        # 
+        # self.odom_last_pose = self.odom_pose.copy()
+        
+            
+        
         pass
         
 
