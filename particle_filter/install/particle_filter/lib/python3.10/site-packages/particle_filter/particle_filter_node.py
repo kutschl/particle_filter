@@ -316,8 +316,6 @@ class ParticleFilter(Node):
         lut_width = int(self.lidar_range_max_px)+1
         self.sensor_model_lut = np.zeros(shape=(lut_width, lut_width))
         
-        self.get_logger().info(f'{lut_width, z_hit, z_short, z_max, z_rand, sigma_hit, lambda_short, self.map_info.resolution}')
-        (1001, 0.85, 0.1, 0.025, 0.025, 0.0, 12.50000027939678, 0.019999999552965164)
         # vectors for measured range (zm) and expected range (ze)
         zm=np.arange(0, lut_width, 1)
         ze=np.arange(0, lut_width, 1)
@@ -330,7 +328,6 @@ class ParticleFilter(Node):
         # P hit
         P_hit = (np.sqrt(2*np.pi)*sigma_hit)*np.exp(-Z**2/(2*sigma_hit**2))
         P_hit = P_hit/np.sum(P_hit, axis=0)
-        self.get_logger().info(f'{np.sum(P_hit, axis=0)}')
         
         # P short
         T_short = np.where(ZM>ZE, 0, 1)
@@ -350,7 +347,8 @@ class ParticleFilter(Node):
         self.sensor_model_lut = z_hit*P_hit + z_short*P_short + z_max*P_max + z_rand*P_rand
         if self.rangelib_variant > 0:
             self.raycasting_method.set_sensor_model(self.sensor_model_lut)      
-            
+        
+        del P_hit, P_max, P_rand, P_short
         self.sensor_model_initialized = True  
         self.get_logger().info('Sensor model precomputed!')
         
@@ -363,7 +361,8 @@ class ParticleFilter(Node):
         particles[:,0] = init_pose_x + np.random.normal(scale=self.init_var_x, size=self.num_particles)    
         particles[:,1] = init_pose_y + np.random.normal(scale=self.init_var_y, size=self.num_particles)    
         particles[:,2] = init_pose_theta + np.random.normal(scale=self.init_var_theta, size=self.num_particles)       
-        self.particles = particles
+        self.particles = particles.copy()
+        del particles
         self.get_logger().info(f'Initial particle set computed around ({init_pose_x, init_pose_y, init_pose_theta}).')
         
         
@@ -404,12 +403,13 @@ class ParticleFilter(Node):
         particles[:, 1] = s*particles_buffer[:,0] - c*particles_buffer[:,1]
         particles[:,:2] = float(scale)*particles[:,:2] 
         # Translation
-        particles[:, 0] = particles[:, 0] + self.map_info.origin.position.x
-        particles[:, 1] = particles[:, 1] + self.map_info.origin.position.y
-        particles[:, 2] = particles[:, 2] + angle
+        particles[:, 0] += self.map_info.origin.position.x
+        particles[:, 1] += self.map_info.origin.position.y
+        particles[:, 2] += angle
         
         # Save initial particle set
-        self.particles = particles
+        self.particles = particles.copy()
+        del particles
         self.get_logger().info(f'Initial particle set computed based on global localization!')
     
     
@@ -446,7 +446,7 @@ class ParticleFilter(Node):
                 self.num_beams,
                 self.num_uniform_beams
             )
-        self.lidar_sampled_idx = downsampler.get_sampled_idx()
+        self.lidar_sampled_idx = downsampler.get_idx()
         self.get_logger().info(f'Lidar downsampling precomputed based on {downsampler.id}.')
         
          

@@ -10,7 +10,7 @@ class DownsamplingInterface(ABC):
     def __init__(self):
         pass
 
-    def get_sampled_idx(self) -> np.ndarray:
+    def get_idx(self) -> np.ndarray:
         return self.sampled_idx
 
 

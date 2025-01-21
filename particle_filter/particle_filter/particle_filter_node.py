@@ -347,7 +347,6 @@ class ParticleFilter(Node):
         self.sensor_model_lut = z_hit*P_hit + z_short*P_short + z_max*P_max + z_rand*P_rand
         if self.rangelib_variant > 0:
             self.raycasting_method.set_sensor_model(self.sensor_model_lut)      
-            
         self.sensor_model_initialized = True  
         self.get_logger().info('Sensor model precomputed!')
         
@@ -360,7 +359,7 @@ class ParticleFilter(Node):
         particles[:,0] = init_pose_x + np.random.normal(scale=self.init_var_x, size=self.num_particles)    
         particles[:,1] = init_pose_y + np.random.normal(scale=self.init_var_y, size=self.num_particles)    
         particles[:,2] = init_pose_theta + np.random.normal(scale=self.init_var_theta, size=self.num_particles)       
-        self.particles = particles
+        self.particles = particles.copy()
         self.get_logger().info(f'Initial particle set computed around ({init_pose_x, init_pose_y, init_pose_theta}).')
         
         
@@ -401,12 +400,12 @@ class ParticleFilter(Node):
         particles[:, 1] = s*particles_buffer[:,0] - c*particles_buffer[:,1]
         particles[:,:2] = float(scale)*particles[:,:2] 
         # Translation
-        particles[:, 0] = particles[:, 0] + self.map_info.origin.position.x
-        particles[:, 1] = particles[:, 1] + self.map_info.origin.position.y
-        particles[:, 2] = particles[:, 2] + angle
+        particles[:, 0] += self.map_info.origin.position.x
+        particles[:, 1] += self.map_info.origin.position.y
+        particles[:, 2] += angle
         
         # Save initial particle set
-        self.particles = particles
+        self.particles = particles.copy()
         self.get_logger().info(f'Initial particle set computed based on global localization!')
     
     
